@@ -1,183 +1,119 @@
-import React from 'react';
-import Form from './components/Form'
-import TodoList from './components/TodoList'
-import Filter from "./components/Filter"
-
+import React from "react";
+import Form from "./components/Form";
+import TodoList from "./components/TodoList";
 
 class TodoApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: [],
-      text: '',
-      class: ''
+      login: false,
+      name: "",
+      password: "",
+      DataisLoaded: false,
     };
-
-    /* this.handleChange = this.handleChange.bind(this); */
   }
 
+  componentDidMount() {
+    this.setState(
+      (state) => {
+        const StoragaName = localStorage.getItem("name");
+        const StoragaPassword = localStorage.getItem("password");
 
-  render() {
-    return (
-      <div >
-        <h3 className="title" >TODO</h3>
+        let name = state.name;
+        let password = state.password;
 
-        <Form 
-          submit={this.handleSubmit}
-          change={this.handleChange}
-          valueApp={this.state.value}
-          numbersOfItems={this.state.items.length}
-          status={this.state.status}
-        />
+        name = StoragaName;
+        password = StoragaPassword;
 
-        <h5 htmlFor="input" className="subtitle">
-            What needs to be done?
-        </h5>
+        return { name, password };
+      },
+      () =>
+        console.log(
+          "Set state from storage",
+          this.state.name,
+          this.state.password
+        )
+    );
 
-        <Filter 
-          allFunction={this.filterAll}
-          activeFunction={this.filterActive}
-          doneFunction={this.filterDone}
-        />
-
-        <TodoList
-            items={this.state.items}
-            onClickDelete={this.handleDelete}
-            onSoftDelete={this.softDelete}
-            className={this.ClassName}
-        />
-    </div>
+    this.checkLogin(
+      localStorage.getItem("name"),
+      localStorage.getItem("password")
     );
   }
 
-  filterAll = () => {
-    this.setState(state => {
+  render() {
+    return (
+      <div>
+        <button id="add" onClick={this.logOut}>
+          Logout
+        </button>
+        <h3 className="title">TODO</h3>
 
-      let items = state.items;  
-
-      items.map(i => {
-        return (
-            i.status != true ? i.status = true : i.status = true  
-         )
-      })
-
-      return {
-        items
-      }
-
-  });
-}
-
-  filterActive = () => {
-    this.setState(state => {
-
-      let items = state.items;  
-
-      items.map(i => {
-        return (
-            i.class == "done" ? i.status = false : i.status = true
-         )
-      })
-
-      return {
-        items
-      }
-
-  });
-}
-
-
-  filterDone = () => {
-      this.setState(state => {
-  
-        let items = state.items;  
-  
-        items.map(i => {
-          return (
-              i.class != "done" ? i.status = false : i.status = true   
-           )
-        })
-  
-        return {
-          items
-        }
-  
-    });
+        {this.state.login ? (
+          <div>
+            <Form />
+            <h5 htmlFor="input" className="subtitle">
+              What needs to be done?
+            </h5>
+            <TodoList />
+          </div>
+        ) : (
+          <div>
+            <div className="subtitle">Please login ! </div>
+            <form onSubmit={this.handleSubmit}>
+              <div className="wrapper">
+                <input
+                  id="input"
+                  type="text"
+                  onChange={(e) => this.handleChangeName(e.target.value)}
+                />
+                <label className="name">Name</label>
+                <input
+                  id="input"
+                  type="password"
+                  onChange={(e) => this.handleChangePassword(e.target.value)}
+                />
+                <label className="password">Password</label>
+              </div>
+              <div className="wrapper">
+                <button className="add login" id="add">
+                  Login
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      </div>
+    );
   }
 
+  handleChangeName = (name) => {
+    this.setState({ name: name }, () => console.log(this.state.name));
+  };
 
-  // 1. Prepis handleChange ako arrow function.
-  handleChange = (e) => {
-    this.setState({ 
-      text: e.target.value,
-      /* items: localStorage.getItem('items') */
-    });
-  }
+  handleChangePassword = (password) => {
+    this.setState({ password: password }, () =>
+      console.log(this.state.password)
+    );
+  };
 
-  handleSubmit = (e) => {
+  handleSubmit = async (e) => {
     e.preventDefault();
-    if (!this.state.text.length) {
-      return;
-    }
+    this.checkLogin(this.state.name, this.state.password);
 
-    let dateOfCreated = new Date()
-   
-    const newItem = {
-      text: this.state.text,
-      id: Date.now(),
-      status: true,
-      dateOfCreated: dateOfCreated
-    };
+    localStorage.setItem("name", this.state.name);
+    localStorage.setItem("password", this.state.password);
+  };
 
-    this.setState(state => {
-      
-      // 2. Zapracuj pridanie polozky newItem do pola items.
-      let items = state.items;
-      items.push(newItem);
+  checkLogin = (name, password) => {
+    this.setState({ login: name === "name" && password === "pass" });
+  };
 
-      /* localStorage.setItem('items', items);
- */
-      return {
-        items,
-        text: ''
-      };
+  logOut = (e) => {
+    this.setState({ name: null, password: null, login: false }, () => {
+      localStorage.clear();
     });
-
-
-
-  }
-
-  handleDelete = (item) => {
-    this.setState(state => {
-
-      let items = state.items;      
-      items = items.filter( i => i.id !== item.id)
-      
-      return {
-        items
-      }
-
-    });
-  }
-
-  softDelete = (item) => {
-    this.setState(state => {
-
-      let items = state.items;  
-
-      items.map(i => {
-        return (
-          item.id == item.id ? item.class = "done" : item.class = ""  
-         )
-      })
-
-      return {
-        items
-      }
-
-    });
-  }
+  };
 }
 
 export default TodoApp;
-

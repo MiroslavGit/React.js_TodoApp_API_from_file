@@ -44,6 +44,7 @@ body {
     text-align: center;
     color: var(--blue);
     font-size: 30px !important;
+    margin-bottom: 20px;
 }
 
 .wrapper {
@@ -51,6 +52,7 @@ body {
     justify-content: center;
     align-items: center;
     gap: 1em;
+    margin-bottom: 20px;
 }
 
 #output {
@@ -120,4 +122,32 @@ i {
 
 .dateOfCreated {
     font-size: 15px;
+}
+
+.eror-api {
+    color: white;
+    text-align: center;
+}
+
+.setButton {
+    padding: 9px;
+    background-color: rgb(24, 24, 105);
+    color: white;
+    margin-right: 10px;
+    border-radius: 10px;
+    border: none;
+}
+
+.setButton:hover {
+    cursor: pointer;
+}
+
+.name,
+.password{
+    color:white;
+    
+}
+
+.logon{
+    text-align: center;
 }
